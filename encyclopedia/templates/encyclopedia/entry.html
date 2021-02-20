@@ -6,8 +6,12 @@ Encyclopedia
 
 {% block body %}
 
-<h2>{{ entry }}</h2>
+    {{ entry|safe }}
 
-<button type="submit">Edit</button>
+    <form action="{%url 'edit' %}" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" >
+    </form>
 
 {% endblock %}

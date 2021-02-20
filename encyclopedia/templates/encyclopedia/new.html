@@ -1,14 +1,15 @@
 {% extends "encyclopedia/layout.html" %}
 
-{% block title %}
-Encyclopedia
-{% endblock %}
-
 {% block body %}
-<h1>Create a new entry</h1>
-
-{{ entry }}
-<h2>{{ entry }}</h2>
-<button typw="submit">Save</button>
-
+    <h1>Add a new entry</h1>
+    <form action="{% url 'new' %}" method="post">
+        <input class="new" type="text" name="title" placeholder="Title">
+        <p></p>
+        <input class="new" type="text" name="content" placeholder="Content">
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit">
+    </form>
+    <p></p>
+    <a href="{% url 'index' %}">View All Entries</a>
 {% endblock %}
