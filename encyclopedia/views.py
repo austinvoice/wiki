@@ -13,7 +13,8 @@ class NewWikiForm(forms.Form):
     content = forms.CharField(widget=forms.Textarea)
 
 class ExistingWikiForm(forms.Form):
-    entry = forms.CharField(label="Title")
+    title = forms.CharField(label="Title")
+    content = forms.CharField(widget=forms.Textarea)
 
 # index page, checks for new user or session
 # TODO capitalize URL with Python function
@@ -53,46 +54,40 @@ def random(request):
 
 # display the entry with dynamic URL by title
 def entry(request, title):
-    entry = util.get_entry(title)
-    entry_html = markdown(entry)
-    return render(request, "encyclopedia/entry.html", {
+    try:
+        entry = util.get_entry(title)
+        entry_html = markdown(entry)
+        return render(request, "encyclopedia/entry.html", {
         "entry": entry_html
-    })
+        })
+    except Exception:
+        return HttpResponse("Sorry, error!")
 
 
-# TODO take title to select the correct entry
-# TODO make the button save to disk
+# edit existing entry and save new to disk
+# TODO populate with existing content
 def edit(request):
-    if request.method == "POST":
-        form = ExistingWikiForm(request.POST)
-        if form.is_valid():
-            entry = form.cleaned_data["entry"]
-            request.session["entry"] = [entry]
-            return render(request, "encyclopedia/edit.html"), {
-                "entry": entry,
-                "form": form
-            }
-        else:
-            return render(request, "encyclopedia/edit.html", {
-            "entry": random(request),
+    try:
+        form = ExistingWikiForm(initial={'title': 'Existing title', 'content': 'Existing content!'})
+        return render(request, "encyclopedia/edit.html", {
             "form": form
-             })
-    else:
-        return render(request, "edit.html", {
+        })
+    except Exception:
+        return render(request, "encyclopedia/index.html", {
             "form": ExistingWikiForm()
         })
 
-    return render(request, "encyclopedia/edit.html", {
-        "form": form
-    })
-
 # search function to find matching entry
+# if file not found return file not found
 def search(request):
     try:
         entry = util.get_entry(request.POST['q'])
-        entry_html = markdown(entry)
-        return render(request, "encyclopedia/entry.html", {
+        if entry != None:
+            entry_html = markdown(entry)
+            return render(request, "encyclopedia/entry.html", {
             "entry": entry_html
-        })
+            })
+        else:
+            return HttpResponse("<h1>Sorry, file not found!<p><a href='/'>Home</a></h1>")
     except Exception:
-        return HttpResponse("<h1>Sorry, file not found!<p><a href='/'>Home</a></h1>")
+        return HttpResponse("<h1>Sorry, error!<p><a href='/'>Home</a></h1>")

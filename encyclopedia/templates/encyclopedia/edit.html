@@ -5,7 +5,13 @@ Encyclopedia
 {% endblock %}
 
 {% block body %}
-{{ form }}
-<button type="submit">Save</button>
-
+<h1>Edit Your Entry</h1>
+<form action="{% url 'edit' %}" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <p></p>
+    <input type="submit">
+</form>
+    <p></p>
+    <a href="{% url 'index' %}">View All Entries</a>
 {% endblock %}

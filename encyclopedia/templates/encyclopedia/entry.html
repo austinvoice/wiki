@@ -5,11 +5,11 @@ Encyclopedia
 {% endblock %}
 
 {% block body %}
-
     {{ entry|safe }}
-<p></p>
-    <form action="{% url 'edit' %}" method="POST">
+    <p></p>
+    <form action="{% url 'edit' %}" method="POST" name="{{ entry }}">
         {% csrf_token %}
-        <button type="search" name="q">Edit</button>
+        <p></p>
+        <input type="submit" value="Edit">
     </form>
 {% endblock %}
