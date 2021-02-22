@@ -7,11 +7,9 @@ Encyclopedia
 {% block body %}
 
     {{ entry|safe }}
-
-    <form action="{%url 'edit' %}" method="post">
+<p></p>
+    <form action="{% url 'edit' %}" method="POST">
         {% csrf_token %}
-        {{ form }}
-        <input type="submit" >
+        <button type="search" name="q">Edit</button>
     </form>
-
 {% endblock %}

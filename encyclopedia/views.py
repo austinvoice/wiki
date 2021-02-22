@@ -10,7 +10,7 @@ from django import forms
 # create a new form to accept entry data
 class NewWikiForm(forms.Form):
     title = forms.CharField(label="Title")
-    content = forms.CharField(label="Content")
+    content = forms.CharField(widget=forms.Textarea)
 
 class ExistingWikiForm(forms.Form):
     entry = forms.CharField(label="Title")
@@ -22,22 +22,22 @@ def index(request):
         "entries": util.list_entries()
     })
 
+# create new entry by saving title, content into .md file
 def new(request):
     if request.method == "POST":
         form = NewWikiForm(request.POST)
         if form.is_valid():
             title = form.cleaned_data["title"]
-            content = forms.cleaned_data["content"]
-            request.session[util.save_entry(title, content)]
-            return HttpResponseRedirect(reverse("index"))
-        else:
-            return render(request, "new.html", {
-                "form": form
-            })
+            content = form.cleaned_data["content"]
+            try:
+                util.save_entry(title, content)
+                return HttpResponse("<h1>Entry saved!<p><a href='/'>Home</a></h1>")
+            except Exception:
+                return HttpResponse("Sorry, error!")
     else:
-        return render(request, "new.html", {
+        return render(request, "encyclopedia/new.html", {
             "form": NewWikiForm()
-        })
+            })
 
 
 # generate a random number in range of entries
@@ -50,15 +50,6 @@ def random(request):
         "entry": entry_html
     })
 
-
-# TODO create def new to create an entry and save it
-# TODO give access to existing content if already exists
-# TODO use textarea and value from Markdown
-def new(request):
-    entry_content = models.TextField()
-    return render(request, "encyclopedia/new.html", {
-      "entry": entry_content
-    })
 
 # TODO get title from index
 # TODO activate the edit button
@@ -94,7 +85,11 @@ def edit(request):
 
 # search function to find matching entry
 def search(request):
-    # title = request.POST["q"]
-    return render(request, "encyclopedia/entry.html", {
-        "entry": markdown(util.get_entry("Django"))
-    })
+    try:
+        entry = util.get_entry(request.POST['q'])
+        entry_html = markdown(entry)
+        return render(request, "encyclopedia/entry.html", {
+            "entry": entry_html
+        })
+    except Exception:
+        return HttpResponse("<h1>Sorry, file not found!<p><a href='/'>Home</a></h1>")

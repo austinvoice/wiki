@@ -3,11 +3,9 @@
 {% block body %}
     <h1>Add a new entry</h1>
     <form action="{% url 'new' %}" method="post">
-        <input class="new" type="text" name="title" placeholder="Title">
-        <p></p>
-        <input class="new" type="text" name="content" placeholder="Content">
         {% csrf_token %}
         {{ form }}
+        <p></p>
         <input type="submit">
     </form>
     <p></p>
