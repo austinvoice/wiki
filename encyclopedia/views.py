@@ -51,10 +51,13 @@ def random(request):
     })
 
 
-# TODO get title from index
-# TODO activate the edit button
+# display the entry with dynamic URL by title
 def entry(request, title):
-    return HttpResponse({util.get_entry(title)})
+    entry = util.get_entry(title)
+    entry_html = markdown(entry)
+    return render(request, "encyclopedia/entry.html", {
+        "entry": entry_html
+    })
 
 
 # TODO take title to select the correct entry
